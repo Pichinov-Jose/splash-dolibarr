@@ -84,7 +84,7 @@ class VariantsManager
      *
      * @param int $fkParent RowId of parent product
      *
-     * @return ProductCombination[]
+     * @return array<int, ProductCombination>
      */
     public static function getProductVariants(int $fkParent): array
     {
@@ -100,7 +100,10 @@ class VariantsManager
         //====================================================================//
         // Load from Db
         $variants = self::$combinations->fetchAllByFkProductParent($fkParent);
-        self::$combinationsCache[$fkParent] = is_array($variants) ? $variants : array();
+        self::$combinationsCache[$fkParent] = array();
+        foreach (is_array($variants) ? $variants : array() as $combination) {
+            self::$combinationsCache[$fkParent][$combination->fk_product_child] = $combination;
+        }
 
         return self::$combinationsCache[$fkParent];
     }
@@ -345,20 +348,70 @@ class VariantsManager
     }
 
     /**
-     * Check if All Given Product Variants Exists on this System
+     * Check if Current Product has unexpected Variants on this System
      *
      * @param int   $parentId RowId of Parent Product
      * @param array $variants Array of Variants Ids
      *
      * @return bool
      */
-    public static function hasAdditionnalVariants(int $parentId, array $variants): bool
+    public static function hasAdditionalVariants(int $parentId, array $variants): bool
+    {
+        return !empty(self::getAdditionalVariants($parentId, $variants));
+    }
+
+    /**
+     * Identify Parent Product by Walking a Received Variants List
+     * Returns the Parent Product of the First Sibling that Already Has a Combination
+     *
+     * @param array $variants Array of Variants Items (each with an "id" key)
+     *
+     * @return null|Product
+     */
+    public static function findParentFromVariantsList(array $variants): ?Product
+    {
+        global $db;
+
+        foreach ($variants as $item) {
+            //====================================================================//
+            // Extract Sibling Product Id from Splash Encoded Reference
+            if (!isset($item["id"]) || !is_string($item["id"])) {
+                continue;
+            }
+            $childId = self::objects()->id($item["id"]);
+            if (empty($childId)) {
+                continue;
+            }
+            //====================================================================//
+            // If Sibling Has a Combination, Return Its Parent Product
+            $combination = self::getProductCombination((int) $childId);
+            if (!$combination) {
+                continue;
+            }
+            $parent = new Product($db);
+            if ($parent->fetch($combination->fk_product_parent) > 0) {
+                return $parent;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get List of Product unexpected Variants on this System
+     *
+     * @param int   $parentId RowId of Parent Product
+     * @param array $variants Array of Variants Ids
+     *
+     * @return array<int, ProductCombination>
+     */
+    public static function getAdditionalVariants(int $parentId, array $variants): array
     {
         //====================================================================//
         // Extract All Variants Product Ids from Given Inputs
         $productIds = self::extractVariantsProductIds($variants);
         if (null == $productIds) {
-            return false;
+            return array();
         }
         //====================================================================//
         // Load Parent Product Variants
@@ -366,11 +419,12 @@ class VariantsManager
 
         //====================================================================//
         // Compare Variants Lists
-        return (count($productIds) < count($parentVariants));
+        // Key-Based Diff: Parent Combinations whose Child Id is NOT in the Received List
+        return array_diff_key($parentVariants, array_flip($productIds));
     }
 
     /**
-     * Check if All Given Product Variants Exists on this System
+     * Move a List of Product Variants from one Parent to another
      *
      * @param int   $parentId    RowId of Current Parent Product
      * @param array $variants    Array of Variants Ids

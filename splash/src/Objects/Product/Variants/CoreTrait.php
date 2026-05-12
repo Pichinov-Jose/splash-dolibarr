@@ -241,66 +241,16 @@ trait CoreTrait
         // Ensure Variants Field data is Iterable
         $fieldData = $fieldData ?? array();
         //====================================================================//
-        // Check if Product has Additional Variants
-        if (!VariantsManager::hasAdditionnalVariants($this->combination->fk_product_parent, $fieldData)) {
+        // Detect Variants Divergence between Dolibarr and Received List
+        // Automatic correction (disconnect/connect of variants) is unlocked
+        // by the Splash AdvancePack add-on — see https://www.dolistore.com
+        if (!VariantsManager::hasAdditionalVariants($this->combination->fk_product_parent, $fieldData)) {
             return;
         }
-        Splash::log()->war("Additional Variants Detected! Ref:".$this->object->ref);
-        //====================================================================//
-        // Check System Uses Strict Variants Mode
-        if (empty(Splash::configuration()->StrictVariantsMode)) {
-            return;
-        }
-
-        $this->updateVariantsParent($fieldData);
-    }
-
-    /**
-     * Create a New Product Parent and Move All Variants to this New One
-     *
-     * @param array $variants Product Variants List
-     *
-     * @return void
-     */
-    protected function updateVariantsParent(array $variants)
-    {
-        global $db;
-        //====================================================================//
-        // Check System Uses Strict Variants Mode
-        if (empty(Splash::configuration()->StrictVariantsMode) || empty($this->combination)) {
-            return;
-        }
-        //====================================================================//
-        // Create a New Parent Product
-        $newParentProduct = null;
-        if (!empty($this->in["base_label"]) && is_string($this->in["base_label"])) {
-            $newParentProduct = $this->createSimpleProduct(
-                $this->object->ref."_base",
-                $this->in["base_label"],
-                false
-            );
-        }
-        //====================================================================//
-        // Create New Parent Product Failed
-        if (!$newParentProduct) {
-            return;
-        }
-        //====================================================================//
-        // Update All Product Combinations Parents
-        VariantsManager::moveAdditionalVariants(
-            $this->combination->fk_product_parent,
-            $variants,
-            $newParentProduct->id
-        );
-        //====================================================================//
-        // Update Current Product Parent
-        $this->setSimple("fk_parent", $newParentProduct->id);
-        //====================================================================//
-        // Reload Product Combinations
-        $this->combination = VariantsManager::getProductCombination((int) $this->object->id);
-        if ($this->combination) {
-            $this->baseProduct = new Product($db);
-            $this->baseProduct->fetch($newParentProduct->id);
-        }
+        Splash::log()->war(sprintf(
+            "Product %s: Variants tree divergence detected — some Dolibarr variants are missing from the received list."
+            ." Unlock automatic variant tree synchronization with the Splash AdvancePack add-on (Dolistore).",
+            $this->object->ref
+        ));
     }
 }

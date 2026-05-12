@@ -100,9 +100,6 @@ class Local implements LocalClassInterface
         // Smart Notifications
         $parameters["SmartNotify"] = (bool) self::getParameter("SPLASH_SMART_NOTIFY");
         //====================================================================//
-        // Strict Variants Mode
-        $parameters["StrictVariantsMode"] = false;
-        //====================================================================//
         // Override Module Parameters with Local User Selected Lang
         if (self::getParameter("SPLASH_LANG")) {
             $parameters["DefaultLanguage"] = self::getParameter("SPLASH_LANG");
@@ -447,10 +444,10 @@ class Local implements LocalClassInterface
         }
 
         //====================================================================//
-        // Check Version is Above 12.0
-        if (self::dolVersionCmp("12.0.0") < 0) {
+        // Check Version is Above 14.0
+        if (self::dolVersionCmp("14.0.0") < 0) {
             return Splash::log()->err(
-                "Splash Module for Dolibarr require Dolibarr Version Above 12.0. "
+                "Splash Module for Dolibarr require Dolibarr Version Above 14.0. "
                     ."Please update your system before using Splash."
             );
         }

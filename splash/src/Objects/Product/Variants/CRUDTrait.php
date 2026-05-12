@@ -175,34 +175,15 @@ trait CRUDTrait
             return null;
         }
         //====================================================================//
-        // Walk on Variant Products
-        $combination = null;
-        foreach ($this->in["variants"] as $listData) {
-            //====================================================================//
-            // Check Product ID is here
-            if (!isset($listData["id"]) || !is_string($listData["id"])) {
-                continue;
-            }
-            //====================================================================//
-            // Extract Variable Product Id
-            if (empty($variantProductId = self::objects()->id($listData["id"]))) {
-                continue;
-            }
-            //====================================================================//
-            // Load Product Combinations
-            $combination = VariantsManager::getProductCombination((int) $variantProductId);
-            if (!empty($combination)) {
-                break;
-            }
-        }
-        //====================================================================//
-        // No Product Combinations Identified
-        if (!$combination) {
+        // Resolve Parent via VariantsManager (walks siblings to find an existing combination)
+        $parent = VariantsManager::findParentFromVariantsList($this->in["variants"]);
+        if (!$parent) {
             return null;
         }
 
         //====================================================================//
-        // Load Base Product (Jedi Mode => Force Loading)
-        return $this->load((string) $combination->fk_product_parent, true);
+        // Re-Load Base Product through Splash (Jedi Mode => Force Loading)
+        // to initialize baseProduct / combination / oldcopy on the current object
+        return $this->load((string) $parent->id, true);
     }
 }
