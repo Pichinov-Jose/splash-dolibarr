@@ -101,6 +101,7 @@ trait CRUDTrait
         $this->setSimple('date', $dateTime->getTimestamp());
         $this->setSimple('date_commande', $dateTime->getTimestamp());
         $this->doCustomerDetection($this->in);
+        $this->setSimple("status", Commande::STATUS_DRAFT);
         $this->setSimple("statut", Commande::STATUS_DRAFT);
         //====================================================================//
         // Pre-Setup Default Payment Term
