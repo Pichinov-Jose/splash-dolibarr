@@ -118,8 +118,16 @@ trait StatusTrait
 
         //====================================================================//
         // Statut Canceled
-        if (Status::isCanceled($fieldData) && (Commande::STATUS_CANCELED != $this->getRawStatus())) {
-            return $this->setStatusCancel();
+        if (Status::isCanceled($fieldData)) {
+            //====================================================================//
+            // Not Already Canceled => Do Cancel
+            if (Commande::STATUS_CANCELED != $this->getRawStatus()) {
+                return $this->setStatusCancel();
+            }
+
+            //====================================================================//
+            // Already Canceled => Nothing to do (do NOT fall through to Re-Validate)
+            return true;
         }
         //====================================================================//
         // If Previously Canceled => Re-Validate
