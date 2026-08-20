@@ -61,5 +61,8 @@
         <!--<const  name="SPLASH_SEQUENCE"  value="Basic" />-->
         <!--<const  name="SPLASH_SEQUENCE"  value="Advanced" />-->
         <!--<const  name="SPLASH_SEQUENCE"  value="Variants" />-->
+
+        <!-- Only Test Specified Fields -->
+        <!-- <const  name="SPLASH_FIELDS"    value="code_compta_client" />-->
     </php>
 </phpunit>

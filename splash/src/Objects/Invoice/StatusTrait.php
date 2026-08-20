@@ -17,6 +17,7 @@ namespace Splash\Local\Objects\Invoice;
 
 use Facture;
 use Splash\Core\SplashCore as Splash;
+use Splash\Local\Objects\Invoice;
 use Splash\Models\Objects\Invoice\Status;
 
 /**
@@ -222,21 +223,7 @@ trait StatusTrait
      */
     protected function getInvoiceStatus(): int
     {
-        //====================================================================//
-        // Manage Deprecation of status property
-        if (!property_exists($this->object, "status")
-            && property_exists($this->object, "statut")
-        ) {
-            /** @phpstan-ignore-next-line */
-            return $this->object->statut;
-        }
-        if (property_exists($this->object, "statut")) {
-            /** @phpstan-ignore-next-line */
-            return $this->object->status ?? $this->object->statut;
-        }
-
-        /** @phpstan-ignore-next-line */
-        return $this->object->status;
+        return Invoice::getInvoiceStatusStatic($this->object);
     }
 
     /**

@@ -100,6 +100,8 @@ class Invoice extends AbstractObject
 
     /**
      * @var Facture
+     *
+     * @phpstan-var Facture
      */
     protected object $object;
 
@@ -158,5 +160,32 @@ class Invoice extends AbstractObject
         //====================================================================//
         //  Translate Object Name
         static::$name = $langs->trans("CustomersInvoices");
+    }
+
+    /**
+     * Get Invoice Status with Version Detection
+     *
+     * Since Dolibarr V19, Uses status instead of statut.
+     * Both properties available since V13.
+     *
+     * @param Facture $invoice
+     *
+     * @return int
+     */
+    public static function getInvoiceStatusStatic(Facture $invoice): int
+    {
+        //====================================================================//
+        // Manage Deprecation of status property
+        if (!property_exists($invoice, "status") && property_exists($invoice, "statut")) {
+            return (int) $invoice->statut;
+        }
+        if (property_exists($invoice, "statut")) {
+            /** @var null|int $status */
+            $status = $invoice->status;
+
+            return (int) ($status ?? $invoice->statut);
+        }
+
+        return (int) $invoice->status;
     }
 }
