@@ -58,6 +58,16 @@ SPL_DfPayMethod     =   Default payment method used by the module (if not specif
 SPL_DfPayCondition  =   Default payment condition used by the module (if not specified)
 
 ################################################################################
+# Admin Page Index - ThirdParty & Contacts
+################################################################################
+
+SPL_ThirdParty_Config         =   ThirdParty & Contacts
+SPL_SplitThirdPartyAddress    =   Split ThirdParty Address on Line Breaks
+SPL_SplitThirdPartyAddress_T  =   Split the third party address on line breaks into up to three address lines (ADD1 / ADD2 / ADD3). Empty lines are removed and extra lines are merged into the last one, so that no data is lost.
+SPL_SplitContactAddress       =   Split Contact Address on Line Breaks
+SPL_SplitContactAddress_T     =   Split the contact address on line breaks into up to three address lines (ADD1 / ADD2 / ADD3). Empty lines are removed and extra lines are merged into the last one, so that no data is lost.
+
+################################################################################
 # Admin Page Index - Products
 ################################################################################
 
@@ -77,6 +87,8 @@ SPL_DetectTaxName   =   Detect tax rates using taxes codes dictionary
 SPL_DetectTaxName_T =   When importing orders and invoices, if a tax rate code is given and can be identified in your dictionary, it will be used by the module instead of the VAT rate provided in the price.
 SPL_DetectBySku     =   Detect Products by Reference (Ref. / SKU)
 SPL_DetectBySku_T   =   When importing orders and invoices, if no Product ID is given, try to identify the product by Reference. 
+SPL_SplitDeliveryAddress      =   Split Delivery Address on Line Breaks
+SPL_SplitDeliveryAddress_T    =   When exporting orders, split the delivery address on line breaks into up to three address lines. Empty lines are removed and extra lines are merged into the last one, so that no data is lost.
 SPL_Orders_Guest    =   Allow Import of Guests Orders & Invoices
 SPL_Orders_Guest_T  =   This mode allow import of Orders & Invoices passed using Guest Mode on modern E-Commerce platforms.
 SPL_Orders_Guest_U  =   Select the default Customer all Guest invoices will be attached to.

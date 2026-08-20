@@ -61,6 +61,16 @@ SPL_DfPayCondition  =   Standaard betalingsvoorwaarde gebruikt door de module (i
 SPL_DfMultiPrice    =   Standaardprijs gebruikt door de module (MultiPrices-modus is ingeschakeld)
 
 ################################################################################
+# Admin Page Index - ThirdParty & Contacts
+################################################################################
+
+SPL_ThirdParty_Config         =   Relaties en contactpersonen
+SPL_SplitThirdPartyAddress    =   Splits het adres van de relatie op regeleinden
+SPL_SplitThirdPartyAddress_T  =   Splits het adres van de relatie op regeleinden in maximaal drie adresregels (ADD1 / ADD2 / ADD3). Lege regels worden verwijderd en extra regels worden samengevoegd in de laatste, zodat er geen gegevens verloren gaan.
+SPL_SplitContactAddress       =   Splits het adres van de contactpersoon op regeleinden
+SPL_SplitContactAddress_T     =   Splits het adres van de contactpersoon op regeleinden in maximaal drie adresregels (ADD1 / ADD2 / ADD3). Lege regels worden verwijderd en extra regels worden samengevoegd in de laatste, zodat er geen gegevens verloren gaan.
+
+################################################################################
 # Admin Page Index - Orders & Invoices
 ################################################################################
 
@@ -70,6 +80,8 @@ SPL_DetectTaxName   =   Detecteer belastingtarieven met behulp van het woordenbo
 SPL_DetectTaxName_T =   Als er bij het importeren van bestellingen en facturen een belastingtariefcode is opgegeven die in uw woordenboek kan worden herkend, wordt deze door de module gebruikt in plaats van het btw-tarief dat in de prijs is vermeld.
 SPL_DetectBySku     =   Detecteer producten op basis van referentie (Ref. / SKU)
 SPL_DetectBySku_T   =   Als er bij het importeren van bestellingen en facturen geen product-ID is opgegeven, probeer het product dan te identificeren via referentie.
+SPL_SplitDeliveryAddress      =   Splits het afleveradres op regeleinden
+SPL_SplitDeliveryAddress_T    =   Splits bij het exporteren van bestellingen het afleveradres op regeleinden in maximaal drie adresregels. Lege regels worden verwijderd en extra regels worden samengevoegd in de laatste, zodat er geen gegevens verloren gaan.
 SPL_Orders_Guest    =   Sta het importeren van gastenorders en facturen toe
 SPL_Orders_Guest_T  =   Met deze modus kunnen bestellingen en facturen worden geïmporteerd met behulp van de gastmodus op moderne e-commerceplatforms.
 SPL_Orders_Guest_U  =   Selecteer de standaardklant waaraan alle gastfacturen zullen worden toegevoegd.

@@ -58,6 +58,16 @@ SPL_DfPayMethod     = Metodo di pagamento predefinito utilizzato dal modulo (se 
 SPL_DfPayCondition  = Condizione di pagamento predefinita utilizzata dal modulo (se non specificata)
 
 ################################################################################
+# Admin Page Index - ThirdParty & Contacts
+################################################################################
+
+SPL_ThirdParty_Config         = Terzi e contatti
+SPL_SplitThirdPartyAddress    = Dividi l'indirizzo del terzo sulle interruzioni di riga
+SPL_SplitThirdPartyAddress_T  = Dividere l'indirizzo del terzo sulle interruzioni di riga in un massimo di tre righe di indirizzo (ADD1 / ADD2 / ADD3). Le righe vuote vengono rimosse e le righe aggiuntive vengono unite nell'ultima, in modo da non perdere dati.
+SPL_SplitContactAddress       = Dividi l'indirizzo del contatto sulle interruzioni di riga
+SPL_SplitContactAddress_T     = Dividere l'indirizzo del contatto sulle interruzioni di riga in un massimo di tre righe di indirizzo (ADD1 / ADD2 / ADD3). Le righe vuote vengono rimosse e le righe aggiuntive vengono unite nell'ultima, in modo da non perdere dati.
+
+################################################################################
 # Admin Page Index - Products
 ################################################################################
 
@@ -77,6 +87,8 @@ SPL_DetectTaxName   = Rileva aliquote fiscali utilizzando il dizionario dei codi
 SPL_DetectTaxName_T = Quando si importano ordini e fatture, se viene fornito un codice di aliquota fiscale che può essere identificato nel dizionario, verrà utilizzato dal modulo anziché dall'aliquota IVA fornita nel prezzo.
 SPL_DetectBySku     = Rileva prodotti per riferimento (Rif. / SKU)
 SPL_DetectBySku_T   = Quando si importano ordini e fatture, se non viene fornito alcun ID prodotto, provare a identificare il prodotto per riferimento.
+SPL_SplitDeliveryAddress      = Dividi l'indirizzo di consegna sulle interruzioni di riga
+SPL_SplitDeliveryAddress_T    = Durante l'esportazione degli ordini, dividere l'indirizzo di consegna sulle interruzioni di riga in un massimo di tre righe di indirizzo. Le righe vuote vengono rimosse e le righe aggiuntive vengono unite nell'ultima, in modo da non perdere dati.
 SPL_Orders_Guest    = Consenti importazione di ordini e fatture ospiti
 SPL_Orders_Guest_T  = Questa modalità consente l'importazione di ordini e fatture trasmesse utilizzando la modalità ospite sulle moderne piattaforme di e-commerce.
 SPL_Orders_Guest_U  = Seleziona il cliente predefinito a cui verranno allegate tutte le fatture dell'ospite.

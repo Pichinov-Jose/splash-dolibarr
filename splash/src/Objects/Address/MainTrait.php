@@ -16,6 +16,7 @@
 namespace Splash\Local\Objects\Address;
 
 use Splash\Local\Local;
+use Splash\Local\Services\AddressLinesManager;
 
 /**
  * Dolibarr Contacts Address Main Fields
@@ -41,6 +42,12 @@ trait MainTrait
             ->microData("http://schema.org/PostalAddress", "streetAddress")
             ->isLogged()
         ;
+        //====================================================================//
+        // Address Complements (ADD2 / ADD3)
+        // Only Available when Contact Address Splitting is Enabled
+        if (AddressLinesManager::isEnabled(AddressLinesManager::CONTACT_MODE)) {
+            AddressLinesManager::buildExtraFields($this->fieldsFactory(), $groupName, false);
+        }
         //====================================================================//
         // Zip Code
         $this->fieldsFactory()->create(SPL_T_VARCHAR)
@@ -172,8 +179,19 @@ trait MainTrait
         // READ Fields
         switch ($fieldName) {
             //====================================================================//
-            // Direct Readings
+            // Address Lines (ADD1 / ADD2 / ADD3)
             case 'address':
+            case 'address2':
+            case 'address3':
+                $this->out[$fieldName] = AddressLinesManager::read(
+                    $this->object->address ?? null,
+                    $fieldName,
+                    AddressLinesManager::CONTACT_MODE
+                );
+
+                break;
+                //====================================================================//
+                // Direct Readings
             case 'zip':
             case 'town':
             case 'state':
@@ -219,8 +237,20 @@ trait MainTrait
         // WRITE Field
         switch ($fieldName) {
             //====================================================================//
-            // Direct Writings
+            // Address Lines (ADD1 / ADD2 / ADD3)
             case 'address':
+            case 'address2':
+            case 'address3':
+                $this->setSimple("address", AddressLinesManager::write(
+                    $this->object->address ?? null,
+                    $fieldName,
+                    $fieldData,
+                    AddressLinesManager::CONTACT_MODE
+                ));
+
+                break;
+                //====================================================================//
+                // Direct Writings
             case 'zip':
             case 'town':
             case 'phone_pro':

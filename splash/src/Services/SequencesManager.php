@@ -88,6 +88,7 @@ class SequencesManager
         self::setupVariants(false);
         self::setupGuestOrders(false);
         self::setupCustomerRequiredFields(false);
+        self::setupAddressSplit(false);
 
         return array();
     }
@@ -98,6 +99,7 @@ class SequencesManager
      * - Multi Prices Mode is Active
      * - Extra Fields are Enabled
      * - Guest Orders Mode is Active
+     * - Postal Address Splitting is Active
      *
      * @return string[]
      */
@@ -110,6 +112,7 @@ class SequencesManager
         self::setupVariants(false);
         self::setupGuestOrders(true);
         self::setupCustomerRequiredFields(true);
+        self::setupAddressSplit(true);
 
         return array();
     }
@@ -135,6 +138,7 @@ class SequencesManager
         self::setupVariants(true);
         self::setupGuestOrders(false);
         self::setupCustomerRequiredFields(false);
+        self::setupAddressSplit(false);
 
         return array();
     }
@@ -210,6 +214,23 @@ class SequencesManager
         dolibarr_set_const($db, "SPLASH_GUEST_ORDERS_ALLOW", '1', 'chaine', 0, '', self::$entity);
         dolibarr_set_const($db, "SPLASH_GUEST_ORDERS_CUSTOMER", '1', 'chaine', 0, '', self::$entity);
         dolibarr_set_const($db, "SPLASH_GUEST_ORDERS_EMAIL", '1', 'chaine', 0, '', self::$entity);
+    }
+
+    /**
+     * Setup of Postal Address Splitting Modes
+     *
+     * Enables splitting of ThirdParty, Contact & Order Delivery addresses
+     * into three Splash address lines (ADD1 / ADD2 / ADD3).
+     */
+    private static function setupAddressSplit(bool $enabled): void
+    {
+        global $db;
+
+        $val = $enabled ? "1" : "0";
+
+        dolibarr_set_const($db, AddressLinesManager::THIRDPARTY_MODE, $val, 'chaine', 0, '', self::$entity);
+        dolibarr_set_const($db, AddressLinesManager::CONTACT_MODE, $val, 'chaine', 0, '', self::$entity);
+        dolibarr_set_const($db, AddressLinesManager::DELIVERY_MODE, $val, 'chaine', 0, '', self::$entity);
     }
 
     /**

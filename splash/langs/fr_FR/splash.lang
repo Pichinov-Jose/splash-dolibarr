@@ -58,6 +58,16 @@ SPL_DfPayMethod     =   Mode de paiement par défaut utilisée par le module (si
 SPL_DfPayCondition  =   Condition de paiement par défaut utilisée par le module (si non spécifiée)
 
 ################################################################################
+# Admin Page Index - ThirdParty & Contacts
+################################################################################
+
+SPL_ThirdParty_Config         =   Tiers & Contacts
+SPL_SplitThirdPartyAddress    =   Éclater l'adresse du tiers sur les retours à la ligne
+SPL_SplitThirdPartyAddress_T  =   Éclater l'adresse du tiers sur les retours à la ligne en trois lignes d'adresse maximum (ADD1 / ADD2 / ADD3). Les lignes vides sont supprimées et les lignes supplémentaires sont fusionnées dans la dernière, afin de ne perdre aucune donnée.
+SPL_SplitContactAddress       =   Éclater l'adresse du contact sur les retours à la ligne
+SPL_SplitContactAddress_T     =   Éclater l'adresse du contact sur les retours à la ligne en trois lignes d'adresse maximum (ADD1 / ADD2 / ADD3). Les lignes vides sont supprimées et les lignes supplémentaires sont fusionnées dans la dernière, afin de ne perdre aucune donnée.
+
+################################################################################
 # Admin Page Index - Products
 ################################################################################
 
@@ -77,6 +87,8 @@ SPL_DetectTaxName   =   Détécter les taux de taxation selon leurs codes
 SPL_DetectTaxName_T =   Lors de l'import de commandes et de factures, si un code de taux de taxation est donné et peut être identifier dans votre dictionnaire, il sera utilisé par le module à la place du taux de TVA fourni dans le prix.
 SPL_DetectBySku     =   Détécter les produits par Référence (Ref. / SKU)
 SPL_DetectBySku_T   =   Lors de l'import de commandes et de factures, si aucun Id de Produit n'est donné, essayer d'identifier le produit par Réference. 
+SPL_SplitDeliveryAddress      =   Éclater l'adresse de livraison sur les retours à la ligne
+SPL_SplitDeliveryAddress_T    =   Lors de l'export des commandes, éclater l'adresse de livraison sur les retours à la ligne en trois lignes d'adresse maximum. Les lignes vides sont supprimées et les lignes supplémentaires sont fusionnées dans la dernière, afin de ne perdre aucune donnée.
 SPL_Orders_Guest    =   Autoriser l'import de Commandes et de Factures en mode Invité
 SPL_Orders_Guest_T  =   Ce mode permet l'importation des commandes et des factures transmises par le mode Invité sur les plateformes de E-Commerce modernes.
 SPL_Orders_Guest_U  =   Sélectionnez le client par défaut auquel toutes les factures invités seront attachées.

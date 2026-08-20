@@ -107,6 +107,9 @@ include("UpdateMain.php");
 // Update of Local Module Parameters
 include("UpdateLocal.php");
 //====================================================================//
+// Update of ThirdParty & Contacts Parameters
+include("UpdateThirdParty.php");
+//====================================================================//
 // Update of Products Parameters
 include("UpdateProducts.php");
 //====================================================================//
@@ -142,6 +145,7 @@ include("ConfigMain.php");
 //====================================================================//
 // Display Module Local Configuration Block
 include("ConfigLocal.php");
+include("ConfigThirdParty.php");
 include("ConfigProducts.php");
 include("ConfigOrders.php");
 include("ConfigPayments.php");

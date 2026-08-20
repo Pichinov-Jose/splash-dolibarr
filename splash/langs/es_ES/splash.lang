@@ -58,6 +58,16 @@ SPL_DfPayMethod     =   Método de pago predeterminado utilizado por el módulo 
 SPL_DfPayCondition  =   Condición de pago predeterminada utilizada por el módulo (si no se especifica)
 
 ################################################################################
+# Admin Page Index - ThirdParty & Contacts
+################################################################################
+
+SPL_ThirdParty_Config         =   Terceros y contactos
+SPL_SplitThirdPartyAddress    =   Dividir la dirección del tercero en los saltos de línea
+SPL_SplitThirdPartyAddress_T  =   Dividir la dirección del tercero en los saltos de línea en un máximo de tres líneas de dirección (ADD1 / ADD2 / ADD3). Las líneas vacías se eliminan y las líneas adicionales se fusionan en la última, para no perder ningún dato.
+SPL_SplitContactAddress       =   Dividir la dirección del contacto en los saltos de línea
+SPL_SplitContactAddress_T     =   Dividir la dirección del contacto en los saltos de línea en un máximo de tres líneas de dirección (ADD1 / ADD2 / ADD3). Las líneas vacías se eliminan y las líneas adicionales se fusionan en la última, para no perder ningún dato.
+
+################################################################################
 # Admin Page Index - Products
 ################################################################################
 
@@ -77,6 +87,8 @@ SPL_DetectTaxName   =   Detectar tasas de impuestos utilizando el diccionario de
 SPL_DetectTaxName_T =   Al importar pedidos y facturas, si se proporciona un código de tasa impositiva y se puede identificar en su diccionario, el módulo lo utilizará en lugar de la tasa de IVA proporcionada en el precio.
 SPL_DetectBySku     =   Detectar productos por referencia (Ref. / SKU)
 SPL_DetectBySku_T   =   Al importar pedidos y facturas, si no se proporciona una identificación del producto, intente identificar el producto por referencia. 
+SPL_SplitDeliveryAddress      =   Dividir la dirección de entrega en los saltos de línea
+SPL_SplitDeliveryAddress_T    =   Al exportar pedidos, dividir la dirección de entrega en los saltos de línea en un máximo de tres líneas de dirección. Las líneas vacías se eliminan y las líneas adicionales se fusionan en la última, para no perder ningún dato.
 SPL_Orders_Guest    =   Permitir importación de pedidos de invitados y facturas
 SPL_Orders_Guest_T  =   Este modo permite la importación de pedidos y facturas aprobadas utilizando el modo de invitado en las plataformas modernas de comercio electrónico.
 SPL_Orders_Guest_U  =   Seleccione el Cliente predeterminado al que se adjuntarán todas las facturas de Invitado.

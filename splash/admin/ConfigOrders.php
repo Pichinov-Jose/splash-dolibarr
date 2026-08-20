@@ -15,6 +15,7 @@
 
 use Splash\Core\SplashCore as Splash;
 use Splash\Local\Local;
+use Splash\Local\Services\AddressLinesManager;
 
 global $db, $action, $conf, $langs, $error, $form;
 
@@ -81,6 +82,24 @@ if ($conf->global->SPLASH_DECTECT_ITEMS_BY_SKU) {
     echo '</a></td>';
 } else {
     echo '<td><a href="'.filter_input(INPUT_SERVER, "PHP_SELF").'?action=UpdateOrderDetectSkuMode&DetectSku=1">';
+    echo img_picto($langs->trans("Disabled"), 'switch_off');
+    echo '</a></td>';
+}
+echo '  </tr>';
+
+//====================================================================//
+// Split Delivery Address on Line Breaks
+echo '  <tr class="impair">';
+echo '      <td>'.$form->textwithpicto(
+    $langs->trans("SPL_SplitDeliveryAddress"),
+    $langs->trans("SPL_SplitDeliveryAddress_T")
+).'</td>';
+if (AddressLinesManager::isEnabled(AddressLinesManager::DELIVERY_MODE)) {
+    echo '<td><a href="'.filter_input(INPUT_SERVER, "PHP_SELF").'?action=UpdateOrderSplitAddress&SplitAddress=0">';
+    echo img_picto($langs->trans("Enabled"), 'switch_on');
+    echo '</a></td>';
+} else {
+    echo '<td><a href="'.filter_input(INPUT_SERVER, "PHP_SELF").'?action=UpdateOrderSplitAddress&SplitAddress=1">';
     echo img_picto($langs->trans("Disabled"), 'switch_off');
     echo '</a></td>';
 }

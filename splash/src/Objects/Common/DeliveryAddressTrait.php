@@ -19,6 +19,7 @@ use Contact;
 use Splash\Client\Splash;
 use Splash\Local\Dictionary\StaticContactTypes;
 use Splash\Local\Objects\Address;
+use Splash\Local\Services\AddressLinesManager;
 use Splash\Local\Services\ContactsManager;
 
 /**
@@ -77,6 +78,15 @@ trait DeliveryAddressTrait
             ->microData("http://schema.org/Person", "telephone")
             ->isReadOnly()
         ;
+        //====================================================================//
+        // Email
+        $this->fieldsFactory()->create(SPL_T_EMAIL)
+            ->identifier("delivery_email")
+            ->group($groupName)
+            ->name($langs->trans("Email"))
+            ->microData("http://schema.org/DeliveryAddress", "email")
+            ->isReadOnly()
+        ;
     }
 
     /**
@@ -97,6 +107,12 @@ trait DeliveryAddressTrait
             ->group($groupName)
             ->isReadOnly()
         ;
+        //====================================================================//
+        // Address Complements (ADD2 / ADD3)
+        // Only Available when Delivery Address Splitting is Enabled
+        if (AddressLinesManager::isEnabled(AddressLinesManager::DELIVERY_MODE)) {
+            AddressLinesManager::buildExtraFields($this->fieldsFactory(), $groupName, true);
+        }
         //====================================================================//
         // Zip Code
         $this->fieldsFactory()->create(SPL_T_VARCHAR)
@@ -190,6 +206,25 @@ trait DeliveryAddressTrait
                 }
 
                 break;
+                //====================================================================//
+                // Contact Phone with Merge
+            case 'delivery_email':
+                $contact = $this->getDeliveryContact();
+                if ($contact) {
+                    $this->out[$fieldName] = $contact->email ?: null;
+                } else {
+                    $this->out[$fieldName] = null;
+                }
+
+                break;
+                //====================================================================//
+                // Delivery Address Lines
+            case 'address':
+            case 'address2':
+            case 'address3':
+                $this->out[$fieldName] = $this->getDeliveryAddressLine($fieldName);
+
+                break;
             default:
                 return;
         }
@@ -208,7 +243,6 @@ trait DeliveryAddressTrait
         switch ($fieldName) {
             //====================================================================//
             // Direct Readings
-            case 'address':
             case 'zip':
             case 'town':
             case 'state':
@@ -224,6 +258,24 @@ trait DeliveryAddressTrait
                 return;
         }
         unset($this->in[$key]);
+    }
+
+    /**
+     * Get One of the Delivery Address Lines
+     *
+     * @param string $fieldName Splash Field Identifier
+     *
+     * @return null|string
+     */
+    private function getDeliveryAddressLine(string $fieldName): ?string
+    {
+        $contact = $this->getDeliveryContact();
+
+        return AddressLinesManager::read(
+            $contact->address ?? null,
+            $fieldName,
+            AddressLinesManager::DELIVERY_MODE
+        );
     }
 
     /**
