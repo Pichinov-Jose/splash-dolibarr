@@ -126,17 +126,24 @@ trait AddressTrait
      */
     protected function setAddressLinesFields(string $fieldName, ?string $fieldData): void
     {
-        if (!in_array($fieldName, AddressLinesManager::FIELDS, true)) {
+        //====================================================================//
+        // All Address Lines are Consumed at Once, on First One Received
+        if (!in_array($fieldName, AddressLinesManager::FIELDS, true)
+            || !array_key_exists($fieldName, $this->in)) {
             return;
         }
+        //====================================================================//
+        // Current Field Value Wins: it was normalized by the Parser
+        $receivedData = array($fieldName => $fieldData) + $this->in;
         $this->setSimple("address", AddressLinesManager::write(
             $this->object->address ?? null,
-            $fieldName,
-            $fieldData,
+            $receivedData,
             AddressLinesManager::THIRDPARTY_MODE
         ));
 
-        unset($this->in[$fieldName]);
+        foreach (AddressLinesManager::FIELDS as $lineField) {
+            unset($this->in[$lineField]);
+        }
     }
 
     /**

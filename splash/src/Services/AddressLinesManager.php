@@ -196,27 +196,40 @@ class AddressLinesManager
     }
 
     /**
-     * Write One Address Line into a Dolibarr Address
+     * Write All Received Address Lines into a Dolibarr Address
      *
-     * When splitting is disabled, the primary line overwrites the whole address
-     * & extra lines are ignored.
+     * Every received line is applied in a single pass: Splash sends address
+     * lines one by one, and a line by line read/modify/write would depend on
+     * their arrival order & drop lines placed after an empty one.
      *
-     * @param null|string $address   Raw Dolibarr Multiline Address
-     * @param string      $fieldName Splash Field Identifier
-     * @param null|string $fieldData New Line Value
-     * @param string      $configKey Scope Config Key
+     * When splitting is disabled, only the primary line is writable.
+     *
+     * @param null|string $address      Raw Dolibarr Multiline Address
+     * @param array       $receivedData Received Object Data
+     * @param string      $configKey    Scope Config Key
      *
      * @return null|string Updated Raw Dolibarr Multiline Address
      */
-    public static function write(?string $address, string $fieldName, ?string $fieldData, string $configKey): ?string
+    public static function write(?string $address, array $receivedData, string $configKey): ?string
     {
         //====================================================================//
         // Splitting is Disabled => Only Primary Line is Writable
         if (!self::isEnabled($configKey)) {
-            return self::isExtraLine($fieldName) ? $address : $fieldData;
+            return array_key_exists(self::FIELDS[0], $receivedData)
+                ? self::toLine($receivedData[self::FIELDS[0]])
+                : $address
+            ;
+        }
+        //====================================================================//
+        // Apply Every Received Line on Current Address
+        $lines = self::split($address);
+        foreach (self::FIELDS as $index => $fieldName) {
+            if (array_key_exists($fieldName, $receivedData)) {
+                $lines[$index] = self::toLine($receivedData[$fieldName]);
+            }
         }
 
-        return self::replace($address, $fieldName, $fieldData);
+        return self::join(...$lines);
     }
 
     //====================================================================//
@@ -275,6 +288,18 @@ class AddressLinesManager
     //====================================================================//
     // PRIVATE METHODS
     //====================================================================//
+
+    /**
+     * Normalize a Received Field Value to an Address Line
+     *
+     * @param mixed $fieldData Received Field Value
+     *
+     * @return null|string
+     */
+    private static function toLine($fieldData): ?string
+    {
+        return is_scalar($fieldData) ? (string) $fieldData : null;
+    }
 
     /**
      * Trim Given Lines & Filter Out Empty Ones

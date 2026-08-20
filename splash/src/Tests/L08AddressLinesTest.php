@@ -187,15 +187,15 @@ class L08AddressLinesTest extends TestCase
         $address = "12 rue X\nBat. B\nEtage 3";
         Assert::assertSame(
             "1 rue Y\nBat. B\nEtage 3",
-            Manager::write($address, "address", "1 rue Y", Manager::CONTACT_MODE)
+            Manager::write($address, array("address" => "1 rue Y"), Manager::CONTACT_MODE)
         );
         Assert::assertSame(
             "12 rue X\nBat. C\nEtage 3",
-            Manager::write($address, "address2", "Bat. C", Manager::CONTACT_MODE)
+            Manager::write($address, array("address2" => "Bat. C"), Manager::CONTACT_MODE)
         );
         Assert::assertSame(
             "12 rue X\nBat. B",
-            Manager::write($address, "address3", null, Manager::CONTACT_MODE)
+            Manager::write($address, array("address3" => null), Manager::CONTACT_MODE)
         );
     }
 
@@ -210,15 +210,41 @@ class L08AddressLinesTest extends TestCase
         $address = "12 rue X\nBat. B";
         //====================================================================//
         // Primary Line Overwrites Whole Address, Extra Lines are Ignored
-        Assert::assertSame("1 rue Y", Manager::write($address, "address", "1 rue Y", Manager::CONTACT_MODE));
-        Assert::assertSame($address, Manager::write($address, "address2", "Bat. C", Manager::CONTACT_MODE));
-        Assert::assertSame($address, Manager::write($address, "address3", "Etage 3", Manager::CONTACT_MODE));
+        Assert::assertSame(
+            "1 rue Y",
+            Manager::write($address, array("address" => "1 rue Y"), Manager::CONTACT_MODE)
+        );
+        Assert::assertSame(
+            $address,
+            Manager::write($address, array("address2" => "Bat. C"), Manager::CONTACT_MODE)
+        );
+        Assert::assertSame(
+            $address,
+            Manager::write($address, array("address3" => "Etage 3"), Manager::CONTACT_MODE)
+        );
+    }
+
+    /**
+     * Test Writing Several Lines at Once, whatever their Order
+     *
+     * Regression: Splash sends address lines one by one. Applying them
+     * one at a time would drop a line received before an empty lower one.
+     *
+     * @dataProvider writeAtOnceProvider
+     *
+     * @param array       $receivedData Received Object Data
+     * @param null|string $expected     Expected Raw Dolibarr Address
+     *
+     * @return void
+     */
+    public function testWriteAtOnce(array $receivedData, ?string $expected): void
+    {
+        $this->setSplitMode(true);
+        Assert::assertSame($expected, Manager::write(null, $receivedData, Manager::CONTACT_MODE));
     }
 
     /**
      * Test Complete Object Cycle, as Performed by Splash on Objects
-     *
-     * Splash writes address lines one by one, then reads them back.
      *
      * @return void
      */
@@ -227,11 +253,12 @@ class L08AddressLinesTest extends TestCase
         $this->setSplitMode(true);
         $expected = array("12 rue X", "Bat. B", "Etage 3");
         //====================================================================//
-        // Write (3 => 1), One Line at a Time
-        $address = null;
-        foreach ($expected as $index => $value) {
-            $address = Manager::write($address, Manager::FIELDS[$index], $value, Manager::CONTACT_MODE);
-        }
+        // Write (3 => 1) from an Empty Address
+        $address = Manager::write(null, array(
+            "address" => $expected[0],
+            "address2" => $expected[1],
+            "address3" => $expected[2],
+        ), Manager::CONTACT_MODE);
         Assert::assertSame("12 rue X\nBat. B\nEtage 3", $address);
         //====================================================================//
         // Read (1 => 3)
@@ -267,6 +294,31 @@ class L08AddressLinesTest extends TestCase
                 array("12 rue X", "Bat. B", "Etage 3 Porte 4")
             ),
             'trimmed' => array("  12 rue X  \n  Bat. B  ", array("12 rue X", "Bat. B", null)),
+        );
+    }
+
+    /**
+     * Received Data for At Once Writings
+     *
+     * @return array<string, array<int, mixed>>
+     */
+    public function writeAtOnceProvider(): array
+    {
+        return array(
+            'natural order' => array(
+                array("address" => "12 rue X", "address2" => "Bat. B"),
+                "12 rue X\nBat. B",
+            ),
+            'reversed order' => array(
+                array("address2" => "Bat. B", "address" => "12 rue X"),
+                "12 rue X\nBat. B",
+            ),
+            'three reversed' => array(
+                array("address3" => "Etage 3", "address2" => "Bat. B", "address" => "12 rue X"),
+                "12 rue X\nBat. B\nEtage 3",
+            ),
+            'second only' => array(array("address2" => "Bat. B"), "Bat. B"),
+            'nothing received' => array(array(), null),
         );
     }
 
