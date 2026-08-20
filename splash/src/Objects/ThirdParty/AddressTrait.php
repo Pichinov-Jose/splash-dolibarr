@@ -105,6 +105,41 @@ trait AddressTrait
     }
 
     /**
+     * Read ThirdParty Address Lines (ADD1 / ADD2 / ADD3)
+     */
+    protected function getAddressLinesFields(string $key, string $fieldName): void
+    {
+        if (!in_array($fieldName, AddressLinesManager::FIELDS, true)) {
+            return;
+        }
+        $this->out[$fieldName] = AddressLinesManager::read(
+            $this->object->address ?? null,
+            $fieldName,
+            AddressLinesManager::THIRDPARTY_MODE
+        );
+
+        unset($this->in[$key]);
+    }
+
+    /**
+     * Write ThirdParty Address Lines (ADD1 / ADD2 / ADD3)
+     */
+    protected function setAddressLinesFields(string $fieldName, ?string $fieldData): void
+    {
+        if (!in_array($fieldName, AddressLinesManager::FIELDS, true)) {
+            return;
+        }
+        $this->setSimple("address", AddressLinesManager::write(
+            $this->object->address ?? null,
+            $fieldName,
+            $fieldData,
+            AddressLinesManager::THIRDPARTY_MODE
+        ));
+
+        unset($this->in[$fieldName]);
+    }
+
+    /**
      * Read requested Field
      *
      * @param string $key       Input List Key
@@ -118,19 +153,7 @@ trait AddressTrait
         // READ Fields
         switch ($fieldName) {
             //====================================================================//
-            // Address Lines (ADD1 / ADD2 / ADD3)
-            case 'address':
-            case 'address2':
-            case 'address3':
-                $this->out[$fieldName] = AddressLinesManager::read(
-                    $this->object->address ?? null,
-                    $fieldName,
-                    AddressLinesManager::THIRDPARTY_MODE
-                );
-
-                break;
-                //====================================================================//
-                // Direct Readings
+            // Direct Readings
             case 'zip':
             case 'town':
             case 'state':
@@ -160,17 +183,6 @@ trait AddressTrait
         //====================================================================//
         // WRITE Field
         switch ($fieldName) {
-            case 'address':
-            case 'address2':
-            case 'address3':
-                $this->setSimple("address", AddressLinesManager::write(
-                    $this->object->address ?? null,
-                    $fieldName,
-                    $fieldData,
-                    AddressLinesManager::THIRDPARTY_MODE
-                ));
-
-                break;
             case 'zip':
             case 'town':
                 $this->setSimple($fieldName, $fieldData);

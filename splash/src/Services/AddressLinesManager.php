@@ -96,8 +96,7 @@ class AddressLinesManager
     {
         //====================================================================//
         // Split on Line Breaks & Remove Empty Lines
-        $rawLines = preg_split('/\R/', (string) $address) ?: array();
-        $lines = array_values(array_filter(array_map('trim', $rawLines), 'strlen'));
+        $lines = self::filterEmptyLines(preg_split('/\R/', (string) $address) ?: array());
         //====================================================================//
         // Merge Extra Lines into Last One to Prevent Data Loss
         if (count($lines) > self::MAX_LINES) {
@@ -119,7 +118,7 @@ class AddressLinesManager
      */
     public static function join(?string ...$lines): ?string
     {
-        $cleaned = array_filter(array_map('trim', array_map('strval', $lines)), 'strlen');
+        $cleaned = self::filterEmptyLines(array_map('strval', $lines));
 
         return $cleaned ? implode("\n", $cleaned) : null;
     }
@@ -271,5 +270,26 @@ class AddressLinesManager
         global $conf;
 
         return !empty($conf->global->{$configKey});
+    }
+
+    //====================================================================//
+    // PRIVATE METHODS
+    //====================================================================//
+
+    /**
+     * Trim Given Lines & Filter Out Empty Ones
+     *
+     * @param string[] $lines Raw Address Lines
+     *
+     * @return string[] Re-indexed, Non Empty Address Lines
+     */
+    private static function filterEmptyLines(array $lines): array
+    {
+        return array_values(array_filter(
+            array_map('trim', $lines),
+            static function (string $line): bool {
+                return "" !== $line;
+            }
+        ));
     }
 }

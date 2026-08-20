@@ -22,6 +22,8 @@ use stdClass;
 
 /**
  * Local Test Suite - Verify Splitting & Joining of Postal Address Lines
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class L08AddressLinesTest extends TestCase
 {

@@ -169,6 +169,8 @@ trait DeliveryAddressTrait
 
     /**
      * Read requested Field
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function getDeliveryAddressFields(string $key, string $fieldName): void
     {
@@ -217,17 +219,27 @@ trait DeliveryAddressTrait
                 }
 
                 break;
-                //====================================================================//
-                // Delivery Address Lines
-            case 'address':
-            case 'address2':
-            case 'address3':
-                $this->out[$fieldName] = $this->getDeliveryAddressLine($fieldName);
-
-                break;
             default:
                 return;
         }
+        unset($this->in[$key]);
+    }
+
+    /**
+     * Read Delivery Address Lines (ADD1 / ADD2 / ADD3)
+     */
+    protected function getDeliveryLinesFields(string $key, string $fieldName): void
+    {
+        if (!in_array($fieldName, AddressLinesManager::FIELDS, true)) {
+            return;
+        }
+        $contact = $this->getDeliveryContact();
+        $this->out[$fieldName] = AddressLinesManager::read(
+            $contact->address ?? null,
+            $fieldName,
+            AddressLinesManager::DELIVERY_MODE
+        );
+
         unset($this->in[$key]);
     }
 
@@ -258,24 +270,6 @@ trait DeliveryAddressTrait
                 return;
         }
         unset($this->in[$key]);
-    }
-
-    /**
-     * Get One of the Delivery Address Lines
-     *
-     * @param string $fieldName Splash Field Identifier
-     *
-     * @return null|string
-     */
-    private function getDeliveryAddressLine(string $fieldName): ?string
-    {
-        $contact = $this->getDeliveryContact();
-
-        return AddressLinesManager::read(
-            $contact->address ?? null,
-            $fieldName,
-            AddressLinesManager::DELIVERY_MODE
-        );
     }
 
     /**
