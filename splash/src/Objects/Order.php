@@ -70,6 +70,7 @@ class Order extends AbstractObject
     use Order\ItemsTrait;
     use Order\StatusTrait;
     use Order\StatusFlagsTrait;
+    use Order\InvoiceLinkTrait;
 
     //====================================================================//
     // ExtraFields Type
