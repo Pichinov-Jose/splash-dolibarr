@@ -40,7 +40,15 @@ class TaxManager
         $sql .= " t.localtax1_type, t.localtax2 as localtax2_tx, t.localtax2_type,";
         $sql .= " t.recuperableonly as npr";
         $sql .= " FROM ".MAIN_DB_PREFIX."c_tva as t";
-        $sql .= " WHERE t.fk_pays = ".$countryId." AND t.taux = ".$vatRate;
+        $sql .= " WHERE t.fk_pays = ".$countryId." AND t.taux = ".$vatRate." AND t.active = 1";
+        //====================================================================//
+        // Order results so we always pick the standard sale VAT code first:
+        // a code like TVAFR20 before IMMO/CEE variants, any code before the
+        // code-less row, the recoverable rate before NPR ones, rowid to be stable.
+        $sql .= " ORDER BY (t.code LIKE 'TVA%') DESC,";
+        $sql .= " (t.code IS NOT NULL AND t.code <> '') DESC,";
+        $sql .= " t.recuperableonly ASC, t.rowid ASC";
+        $sql .= " LIMIT 1";
         $results = $db->query($sql);
         if ($results) {
             return  $db->fetch_object($results);
