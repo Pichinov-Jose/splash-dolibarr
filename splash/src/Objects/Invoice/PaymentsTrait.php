@@ -226,6 +226,9 @@ trait PaymentsTrait
             return;
         }
         //====================================================================//
+        // Set Aside Payments the Remote Source could not have created
+        $this->protectLocalOnlyPayments();
+        //====================================================================//
         // Verify Lines List & Update if Needed
         $firstMethodId = null;
         foreach ($fieldData ?? array() as $lineData) {
@@ -302,6 +305,77 @@ trait PaymentsTrait
                 Splash::log()->errTrace("Unable to Delete Invoice Payment (".$paymentData->id.")");
             }
         }
+    }
+
+    /**
+     * Set Aside Payments that the Remote Source could not have created
+     *
+     * Payments are paired with remote lines by position, and every payment
+     * left over is deleted. A payment entered locally for a movement the
+     * source never knew about would therefore be reused for an unrelated
+     * remote line, or silently destroyed.
+     *
+     * Those payments are removed from the working list: they are neither
+     * reused nor deleted, and the sync leaves them untouched.
+     *
+     * @return void
+     */
+    private function protectLocalOnlyPayments(): void
+    {
+        foreach ($this->payments as $index => $paymentData) {
+            $reason = $this->getPaymentProtectionReason($paymentData);
+            if (!$reason) {
+                continue;
+            }
+            Splash::log()->war(sprintf(
+                "Invoice Payment %s (%s) was left untouched: %s.",
+                $paymentData->id ?? "?",
+                $paymentData->code ?? "?",
+                $reason
+            ));
+            unset($this->payments[$index]);
+        }
+        $this->payments = array_values($this->payments);
+    }
+
+    /**
+     * Identify why a Payment must not be managed by a Sync
+     *
+     * @param object $paymentData Payment Line, as loaded by loadPayments()
+     *
+     * @return null|string Reason, or Null if Splash may manage this Payment
+     */
+    private function getPaymentProtectionReason(object $paymentData): ?string
+    {
+        global $db;
+
+        //====================================================================//
+        // Payment Method has no Splash equivalent => entered locally
+        // getSplashCode() returns the raw Dolibarr code when no mapping exists,
+        // so an unmapped method is never a key of PaymentMethods::KNOWN.
+        if (!isset(PaymentMethods::KNOWN[(string) ($paymentData->method ?? "")])) {
+            return sprintf(
+                "payment method '%s' has no Splash equivalent, it cannot come from the source",
+                $paymentData->code ?? "?"
+            );
+        }
+        //====================================================================//
+        // Bank Entry already reconciled with a Statement => Accounting is closed
+        if (!empty($paymentData->fk_bank)) {
+            $sql = "SELECT rappro, num_releve FROM ".MAIN_DB_PREFIX."bank";
+            $sql .= " WHERE rowid = ".(int) $paymentData->fk_bank;
+            $result = $db->query($sql);
+            if ($result && ($bank = $db->fetch_object($result))) {
+                if (!empty($bank->rappro) || !empty($bank->num_releve)) {
+                    return sprintf(
+                        "bank entry is reconciled with statement '%s'",
+                        $bank->num_releve ?? ""
+                    );
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
