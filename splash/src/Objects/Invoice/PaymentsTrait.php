@@ -226,6 +226,13 @@ trait PaymentsTrait
             return;
         }
         //====================================================================//
+        // The Local Decomposition may be richer than the Source's
+        if ($this->hasRicherLocalPayments($fieldData)) {
+            unset($this->in[$fieldName]);
+
+            return;
+        }
+        //====================================================================//
         // Set Aside Payments the Remote Source could not have created
         $this->protectLocalOnlyPayments();
         //====================================================================//
@@ -305,6 +312,59 @@ trait PaymentsTrait
                 Splash::log()->errTrace("Unable to Delete Invoice Payment (".$paymentData->id.")");
             }
         }
+    }
+
+    /**
+     * Check whether the Local Payments hold more detail than the Source can express
+     *
+     * A source that models a single payment per order cannot describe an
+     * instalment plan. When the local side already holds several payments that
+     * cover the invoice, pairing them one-by-one with the source's shorter list
+     * keeps the first and deletes the rest: the schedule is destroyed and
+     * replaced by a single line, for the same total.
+     *
+     * There is nothing to gain from writing in that case — the local set is a
+     * refinement of the very fact the source is reporting — so the payments are
+     * left exactly as they are, neither paired, deleted, nor added to.
+     *
+     * @param null|array $fieldData Payment lines declared by the source
+     *
+     * @return bool
+     */
+    private function hasRicherLocalPayments(?array $fieldData): bool
+    {
+        $local = count($this->payments);
+        //====================================================================//
+        // A single local payment is never richer than the source's view
+        if ($local < 2) {
+            return false;
+        }
+        //====================================================================//
+        // The source describes at least as many lines => let it drive
+        if ($local <= count($fieldData ?? array())) {
+            return false;
+        }
+        //====================================================================//
+        // The local payments must already cover the invoice
+        $total = abs((float) ($this->object->total_ttc ?? 0));
+        if ($total < 1E-6) {
+            return false;
+        }
+        $paid = 0.0;
+        foreach ($this->payments as $paymentData) {
+            $paid += abs((float) ($paymentData->amount ?? 0));
+        }
+        if (($paid + 1E-6) < $total) {
+            return false;
+        }
+        Splash::log()->war(sprintf(
+            "Invoice %s keeps its %d local payments: the source declares %d line(s) for the same total.",
+            $this->object->ref ?? "?",
+            $local,
+            count($fieldData ?? array())
+        ));
+
+        return true;
     }
 
     /**
