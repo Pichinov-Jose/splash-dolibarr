@@ -234,7 +234,7 @@ trait PaymentsTrait
         }
         //====================================================================//
         // Set Aside Payments the Remote Source could not have created
-        $this->protectLocalOnlyPayments();
+        $this->protectLocalOnlyPayments($fieldData);
         //====================================================================//
         // Verify Lines List & Update if Needed
         $firstMethodId = null;
@@ -345,7 +345,9 @@ trait PaymentsTrait
             return false;
         }
         //====================================================================//
-        // The local payments must already cover the invoice
+        // The local payments must already settle the invoice.
+        // Credit notes and deposits count: an invoice closed by payments plus a
+        // discount is settled just as surely as one closed by payments alone.
         $total = abs((float) ($this->object->total_ttc ?? 0));
         if ($total < 1E-6) {
             return false;
@@ -353,6 +355,12 @@ trait PaymentsTrait
         $paid = 0.0;
         foreach ($this->payments as $paymentData) {
             $paid += abs((float) ($paymentData->amount ?? 0));
+        }
+        if (method_exists($this->object, "getSumCreditNotesUsed")) {
+            $paid += abs((float) $this->object->getSumCreditNotesUsed());
+        }
+        if (method_exists($this->object, "getSumDepositsUsed")) {
+            $paid += abs((float) $this->object->getSumDepositsUsed());
         }
         if (($paid + 1E-6) < $total) {
             return false;
@@ -378,12 +386,22 @@ trait PaymentsTrait
      * Those payments are removed from the working list: they are neither
      * reused nor deleted, and the sync leaves them untouched.
      *
+     * @param null|array $fieldData Payment lines declared by the source
+     *
      * @return void
      */
-    private function protectLocalOnlyPayments(): void
+    private function protectLocalOnlyPayments(?array $fieldData): void
     {
+        //====================================================================//
+        // Collect the Payment Methods the Source actually declares
+        $remoteMethods = array();
+        foreach ($fieldData ?? array() as $lineData) {
+            if (!empty($lineData["mode"])) {
+                $remoteMethods[(string) $lineData["mode"]] = true;
+            }
+        }
         foreach ($this->payments as $index => $paymentData) {
-            $reason = $this->getPaymentProtectionReason($paymentData);
+            $reason = $this->getPaymentProtectionReason($paymentData, $remoteMethods);
             if (!$reason) {
                 continue;
             }
@@ -401,14 +419,29 @@ trait PaymentsTrait
     /**
      * Identify why a Payment must not be managed by a Sync
      *
-     * @param object $paymentData Payment Line, as loaded by loadPayments()
+     * @param object $paymentData    Payment Line, as loaded by loadPayments()
+     * @param array  $remoteMethods  Payment methods declared by the source, as keys
      *
      * @return null|string Reason, or Null if Splash may manage this Payment
      */
-    private function getPaymentProtectionReason(object $paymentData): ?string
+    private function getPaymentProtectionReason(object $paymentData, array $remoteMethods = array()): ?string
     {
         global $db;
 
+        //====================================================================//
+        // Payment Method is not one the Source declares => a different payment
+        //
+        // Cash recorded locally against an order the shop believes was paid by
+        // card is not another version of the same movement: it is a movement
+        // the source knows nothing about. Pairing them by position would
+        // rewrite the local one to the source's amount and method.
+        if ($remoteMethods && !isset($remoteMethods[(string) ($paymentData->method ?? "")])) {
+            return sprintf(
+                "method '%s' is not among those the source declares (%s)",
+                $paymentData->code ?? "?",
+                implode(", ", array_keys($remoteMethods))
+            );
+        }
         //====================================================================//
         // Payment Method has no Splash equivalent => entered locally
         // getSplashCode() returns the raw Dolibarr code when no mapping exists,
