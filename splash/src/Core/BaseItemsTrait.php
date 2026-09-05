@@ -641,6 +641,20 @@ trait BaseItemsTrait
                 $vatRateOrId = $identifiedVat->rowid;
                 $useId = true;
             }
+            //====================================================================//
+            // No Vat Src Code received => Resolve it from the Vat Rate
+            //
+            // Sources that carry no tax name (e.g. a 0% line on an export
+            // order) would leave vat_src_code empty on the line, even when the
+            // rate identifies a dictionary entry. Resolve by rate and store
+            // the code so accounting exports get a fully qualified tax.
+            if (!$useId && ($identifiedVat = TaxManager::findTaxByRate((float) $this->currentItem->tva_tx))) {
+                if (!empty($identifiedVat->code)) {
+                    $this->currentItem->vat_src_code = $identifiedVat->code;
+                }
+                $vatRateOrId = $identifiedVat->id;
+                $useId = true;
+            }
         }
 
         //====================================================================//
