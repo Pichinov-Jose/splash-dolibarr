@@ -95,6 +95,29 @@ if (!empty($conf->global->PRODUIT_MULTIPRICES)) {
     echo '  </tr>';
 }
 
+//====================================================================//
+// Products Primary Key: Reference or Barcode
+$productPrimary = empty($conf->global->SPLASH_PRODUCT_PRIMARY) ? "ref" : $conf->global->SPLASH_PRODUCT_PRIMARY;
+echo '  <tr class="pair">';
+echo '      <td>'.$form->textwithpicto($langs->trans("SPL_ProductPrimary"), $langs->trans("SPL_ProductPrimaryHelp")).'</td>';
+echo '      <td>';
+echo '          <select name="product_primary" class="flat">';
+foreach (array("ref" => "SPL_ProductPrimaryRef", "barcode" => "SPL_ProductPrimaryBarcode") as $value => $label) {
+    echo '<option value="'.$value.'"'.(($value == $productPrimary) ? ' selected' : '').'>'.$langs->trans($label).'</option>';
+}
+echo '          </select>';
+echo '      </td>';
+echo '  </tr>';
+
+//====================================================================//
+// Only Export GTIN Barcodes
+echo '  <tr class="pair">';
+echo '      <td>'.$form->textwithpicto($langs->trans("SPL_BarcodeGtinOnly"), $langs->trans("SPL_BarcodeGtinOnlyHelp")).'</td>';
+echo '      <td><input type="checkbox" name="barcode_gtin_only" value="1"';
+echo empty($conf->global->SPLASH_BARCODE_GTIN_ONLY) ? '' : ' checked';
+echo '></td>';
+echo '  </tr>';
+
 echo '</tbody></table>';
 
 //====================================================================//

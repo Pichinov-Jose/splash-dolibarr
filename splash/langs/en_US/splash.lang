@@ -76,6 +76,12 @@ SPL_MultiStock      =   Manage Independent Stocks for Each Warehouse
 SPL_DfStock         =   Warehouse used for stocks transactions (if no default warehouse specified at product level)
 SPL_ProductStock    =   Default warehouse for products setup (if empty value or not specified)
 SPL_DfMultiPrice    =   Default price used by the module (MultiPrices mode is enabled)
+SPL_ProductPrimary          =   Products identified by
+SPL_ProductPrimaryRef       =   Reference
+SPL_ProductPrimaryBarcode   =   Barcode (EAN / UPC)
+SPL_ProductPrimaryHelp      =   Field used to find an existing product before creating a new one. All primary keys must match, so only one is used. With the barcode, a code shared by several products identifies none of them, and products without barcode are never identified.
+SPL_BarcodeGtinOnly         =   Only export GTIN barcodes (EAN / UPC)
+SPL_BarcodeGtinOnlyHelp     =   Internal codes (Code 128 labels...) or codes with a wrong check digit are not sent, so they never reach the GTIN fields of a shop or a marketplace.
 
 ################################################################################
 # Admin Page Index - Orders & Invoices

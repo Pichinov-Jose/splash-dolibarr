@@ -68,6 +68,18 @@ if ('UpdateProducts' == $action) {
         }
     }
     //====================================================================//
+    // Update Products Primary Key
+    $productPrimary = ("barcode" == GETPOST('product_primary', 'aZ09')) ? "barcode" : "ref";
+    if (dolibarr_set_const($db, "SPLASH_PRODUCT_PRIMARY", $productPrimary, 'chaine', 0, '', $conf->entity) <= 0) {
+        $errors++;
+    }
+    //====================================================================//
+    // Update Only Export GTIN Barcodes
+    $gtinOnly = GETPOST('barcode_gtin_only', 'int') ? "1" : "0";
+    if (dolibarr_set_const($db, "SPLASH_BARCODE_GTIN_ONLY", $gtinOnly, 'chaine', 0, '', $conf->entity) <= 0) {
+        $errors++;
+    }
+    //====================================================================//
     // DB Commit & Display User Message
     if (! $error) {
         $db->commit();

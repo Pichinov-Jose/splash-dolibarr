@@ -76,6 +76,12 @@ SPL_MultiStock      =   Gérer les Stocks de chaque Entrepôt Indépendamment
 SPL_DfStock         =   Entrepôt utilisée pour les mouvements de stocks (si aucun stock par défaut spécifié pour le produit).
 SPL_ProductStock    =   Entrepôt par défaut pour les configurations produits (si vide ou non spécifié)
 SPL_DfMultiPrice    =   Prix par défaut utilisée par le module (le mode Multi-prix est actif)
+SPL_ProductPrimary          =   Produits identifiés par
+SPL_ProductPrimaryRef       =   Référence
+SPL_ProductPrimaryBarcode   =   Code-barres (EAN / UPC)
+SPL_ProductPrimaryHelp      =   Champ utilisé pour retrouver un produit existant avant d'en créer un nouveau. Toutes les clés primaires doivent concorder, une seule est donc utilisée. Avec le code-barres, un code porté par plusieurs produits n'en identifie aucun, et un produit sans code-barres n'est jamais identifié.
+SPL_BarcodeGtinOnly         =   N'exporter que les codes-barres GTIN (EAN / UPC)
+SPL_BarcodeGtinOnlyHelp     =   Les codes internes (étiquettes Code 128...) ou à chiffre de contrôle faux ne sont pas envoyés : ils n'arrivent jamais dans les champs GTIN d'une boutique ou d'une place de marché.
 
 ################################################################################
 # Admin Page Index - Orders & Invoices

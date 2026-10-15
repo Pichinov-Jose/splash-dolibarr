@@ -49,7 +49,7 @@ trait CoreTrait
             ->isListed()
             ->isLogged()
             ->isRequired()
-            ->isPrimary()
+            ->isPrimary(!self::isBarcodePrimary())
         ;
 
         foreach ($this->getAvailableLanguages() as $isoCode) {
